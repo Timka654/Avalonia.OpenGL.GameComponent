@@ -1,4 +1,5 @@
 ﻿using Avalonia.OpenGL.GameComponent.D3Rendering.Objects;
+using Avalonia.OpenGL.GameComponent.Utils;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,8 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering
 
         event Action<Scene?> OnUpdateScene;
 
+
+        IRenderedObject? Parent { get; }
 
         IReadOnlyList<IRenderedObject> Childs { get; }
 
@@ -35,5 +38,10 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering
         void RemoveScript(IScriptObject script);
 
         void Draw(Matrix4 view, Matrix4 projection);
+
+        event Action? TransformChanged;
+
+        Matrix4 GetModelMatrix();
+        (Vector3 min, Vector3 max) GetBounds();
     }
 }

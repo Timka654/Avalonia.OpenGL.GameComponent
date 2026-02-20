@@ -1,5 +1,7 @@
-﻿using Avalonia.Input;
+﻿using Avalonia.Animation;
+using Avalonia.Input;
 using Avalonia.OpenGL.GameComponent.D3Rendering.Objects;
+using Avalonia.OpenGL.GameComponent.Views;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -11,25 +13,29 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering.Scripts
 {
     class CameraControlScript : IScriptObject
     {
+        MouseCameraControlEnum mode = MouseCameraControlEnum.None;
+
         bool movementPress = false;
         bool positionPress = false;
 
         public bool Active { get; set; } = true;
 
-        protected void OnPointerPressed(object sender, PointerPressedEventArgs e)
+        protected void OnPointerPressed(object? sender, PointerPressedEventArgs e)
         {
             var point = e.GetCurrentPoint(_frame);
 
             if (!movementPress && !positionPress)
             {
                 movementPress = point.Properties.IsLeftButtonPressed;
+
                 positionPress = point.Properties.IsRightButtonPressed;
 
                 _camera.ProcessMouseMovement(new Vector2((float)point.Position.X, (float)point.Position.Y));
+                _camera.ProcessTarget(new Vector2((float)point.Position.X, (float)point.Position.Y));
             }
         }
 
-        protected void OnPointerReleased(object sender, PointerReleasedEventArgs e)
+        protected void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
         {
             var point = e.GetCurrentPoint(_frame);
 
@@ -44,7 +50,7 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering.Scripts
 
         }
 
-        protected void OnPointerMoved(object sender, PointerEventArgs e)
+        protected void OnPointerMoved(object? sender, PointerEventArgs e)
         {
             if (movementPress)
             {
@@ -52,9 +58,15 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering.Scripts
 
                 _camera.ProcessMouseMovement(new Vector2((float)mousePos.X, (float)mousePos.Y));
             }
+            if (positionPress)
+            {
+                var mousePos = e.GetPosition(_frame);
+
+                _camera.ProcessTarget(new Vector2((float)mousePos.X, (float)mousePos.Y));
+            }
         }
 
-        protected void OnPointerWheelChanged(object sender, PointerWheelEventArgs e)
+        protected void OnPointerWheelChanged(object? sender, PointerWheelEventArgs e)
         {
             _camera.ProcessScroll((float)e.Delta.Y);
         }
@@ -88,9 +100,13 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering.Scripts
         {
             if (frame == null && _frame != null)
             {
+                _frame.KeyDown -= OnKeyDown;
+
                 _frame.PointerPressed -= OnPointerPressed;
                 _frame.PointerReleased -= OnPointerReleased;
+
                 _frame.PointerMoved -= OnPointerMoved;
+
                 _frame.PointerWheelChanged -= OnPointerWheelChanged;
             }
 
@@ -98,11 +114,20 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering.Scripts
 
             if (_frame != null)
             {
+                _frame.KeyDown += OnKeyDown;
+
                 _frame.PointerPressed += OnPointerPressed;
                 _frame.PointerReleased += OnPointerReleased;
+
                 _frame.PointerMoved += OnPointerMoved;
+
                 _frame.PointerWheelChanged += OnPointerWheelChanged;
             }
+        }
+
+        private void OnKeyDown(object? sender, KeyEventArgs e)
+        {
+            _camera.ProcessKeyboard(e.PhysicalKey);
         }
 
         CameraScript _camera;
@@ -115,5 +140,12 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering.Scripts
         public void Update()
         {
         }
+    }
+
+    public enum MouseCameraControlEnum
+    {
+        None,
+        Move,
+        Rotation
     }
 }

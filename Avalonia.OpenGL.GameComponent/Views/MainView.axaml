@@ -12,6 +12,36 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
 		<vm:MainViewModel />
 	</Design.DataContext>
+	<Grid>
+		
+		<d3:OpenGL3DFrame x:Name="renderFrame" 
+						  Opacity="" 
+						  Focusable="True" 
+						  HorizontalAlignment="Stretch" 
+						  VerticalAlignment="Stretch">
+		</d3:OpenGL3DFrame>
 
-	<d3:OpenGL3DFrame x:Name="renderFrame" Opacity=""></d3:OpenGL3DFrame>
+		<Border Background="#CC2D2D30"
+					Width="250"
+					HorizontalAlignment="Right"
+					VerticalAlignment="Stretch"
+					Padding="15"
+					IsVisible="False"
+					x:Name="InspectorPanel">
+			
+			<StackPanel Spacing="10">
+				<TextBlock Text="INSPECTOR" Foreground="White" FontWeight="Bold" FontSize="16"/>
+				<Rectangle Height="1" Fill="#555555" Margin="0,5"/>
+
+				<TextBlock Text="Position X:" Foreground="LightGray"/>
+				<TextBox x:Name="PosXTextBox" KeyUp="OnPositionChanged"/>
+
+				<TextBlock Text="Position Y:" Foreground="LightGray"/>
+				<TextBox x:Name="PosYTextBox" KeyUp="OnPositionChanged"/>
+
+				<TextBlock Text="Position Z:" Foreground="LightGray"/>
+				<TextBox x:Name="PosZTextBox" KeyUp="OnPositionChanged"/>
+			</StackPanel>
+		</Border>
+	</Grid>
 </UserControl>

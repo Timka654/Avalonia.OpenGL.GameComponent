@@ -6,8 +6,12 @@ using System.Linq;
 
 namespace Avalonia.OpenGL.GameComponent.D3Rendering
 {
+
+
     public abstract class BaseRenderedObject : IRenderedObject
     {
+        public IRenderedObject? Parent { get; private set { field = value; OnChangeParent(value); } }
+
         public bool Active { get; set; } = true;
 
         private Scene? _currentScene;
@@ -34,13 +38,16 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering
         }
 
         public event Action<Scene?> OnUpdateScene = e => { };
+        public abstract event Action? TransformChanged;
+
+
 
         public Scene? GetScene()
             => _currentScene;
 
         public virtual void OnSceneSet(Scene? scene)
-        { 
-        
+        {
+
         }
 
         List<IScriptObject> _scripts = new List<IScriptObject>();
@@ -63,30 +70,55 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering
             OnScriptAdd(script);
         }
 
-        public virtual void OnScriptAdd(IScriptObject script) { }
+        protected virtual void OnScriptAdd(IScriptObject script) { }
 
-        public abstract void Draw(Matrix4 view, Matrix4 projection);
 
         public void RemoveScript(IScriptObject script)
         { if (_scripts.Remove(script)) { OnScriptRemove(script); script.SetParent(null); } }
 
-        public virtual void OnScriptRemove(IScriptObject script) { }
+        protected virtual void OnScriptRemove(IScriptObject script) { }
+
 
         public TScript? GetScript<TScript>() where TScript : IScriptObject
             => (TScript?)Scripts.SingleOrDefault(x => x is TScript);
 
+
+        protected virtual void OnChangeParent(IRenderedObject? parent) { }
+
         public void AddChild(IRenderedObject child)
         {
+            if (child is BaseRenderedObject baseChild)
+            {
+                if (baseChild.Parent != null) throw new InvalidOperationException("Child already has a parent");
+                baseChild.Parent = this;
+            }
             child.CurrentScene = _currentScene;
             _childs.Add(child);
             OnChildAdd(child);
         }
 
+        protected virtual void OnChildAdd(IRenderedObject child) { }
+
+
         public void RemoveChild(IRenderedObject child)
-        { if (_childs.Remove(child)) { child.CurrentScene = null; OnChildRemove(child); } }
+        {
+            if (_childs.Remove(child))
+            {
+                child.CurrentScene = null;
+                if (child is BaseRenderedObject baseChild)
+                {
+                    baseChild.Parent = null;
+                }
+                OnChildRemove(child);
+            }
+        }
 
-        public virtual void OnChildAdd(IRenderedObject child) { }
+        protected virtual void OnChildRemove(IRenderedObject child) { }
 
-        public virtual void OnChildRemove(IRenderedObject child) { }
+        public abstract void Draw(Matrix4 view, Matrix4 projection);
+
+        public abstract Matrix4 GetModelMatrix();
+
+        public abstract (Vector3 min, Vector3 max) GetBounds();
     }
 }

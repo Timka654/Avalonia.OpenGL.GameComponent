@@ -24,4 +24,19 @@
   <ItemGroup>
     <Folder Include="Controls\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="D3Rendering\Data\Shaders\FragmentShader.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="D3Rendering\Data\Shaders\LitFragmentShader.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="D3Rendering\Data\Shaders\LitVertexShader.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="D3Rendering\Data\Shaders\VertexShader.glsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

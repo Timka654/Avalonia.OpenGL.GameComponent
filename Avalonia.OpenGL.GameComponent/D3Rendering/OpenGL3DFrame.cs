@@ -40,33 +40,6 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering
             GL.Viewport(0, 0, (int)Width, (int)Height);
         }
 
-
-        // A simple vertex shader possible. Just passes through the position vector.
-        const string VertexShaderSource = """
-            #version 330 core
-            layout (location = 0) in vec3 aPos;
-
-            uniform mat4 model;
-            uniform mat4 view;
-            uniform mat4 projection;
-
-            void main()
-            {
-                gl_Position = projection * view * model * vec4(aPos, 1.0);
-            }
-            """;
-
-        // A simple fragment shader. Just a constant red color.
-        const string FragmentShaderSource = """
-            #version 330 core
-            out vec4 FragColor;
-
-            void main()
-            {
-                FragColor = vec4(1.0, 0.5, 0.2, 1.0);
-            }
-            """;
-
         bool inited = false;
 
         public Shader BasicRenderShared { get; private set; }
@@ -97,10 +70,11 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering
 
         protected override void OpenTkInit()
         {
-            BasicRenderShared ??= new Shader(VertexShaderSource, FragmentShaderSource);
+            BasicRenderShared ??= Shader.Default;
 
+            GL.ClearColor(0.1f, 0.5f, 1.0f, 0); 
 
-            GL.ClearColor(0.1f, 0.5f, 1.0f, 0);
+            GL.Enable(EnableCap.DepthTest);
 
             buildViewMatrix();
             
@@ -108,8 +82,6 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering
 
             OnInitializedFrame(this);
         }
-
-        //private Scene currentScene = new Scene();
 
         protected override void OnOpenGlLost()
         {

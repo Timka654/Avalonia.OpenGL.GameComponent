@@ -1,18 +1,22 @@
 ﻿using Avalonia.Input;
+using Avalonia.OpenGL.GameComponent.Utils;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
 
 namespace Avalonia.OpenGL.GameComponent.D3Rendering.Scripts
 {
-    public class CameraScript : IScriptObject
+    public class CameraScript : IScriptObject, ICamera
     {
         public Vector3 Position { get; private set; }
 
         public Vector3 Target { get; private set; } = Vector3.Zero;
-        
+
         public Vector3 Up { get; private set; } = Vector3.UnitY;
-        
+
+        public float MinDistance { get; set; } = 2.0f;
+        public float MaxDistance { get; set; } = 200.0f;
+
         public Matrix4 Projection { get; private set; } = Matrix4.CreatePerspectiveFieldOfView(
             MathHelper.DegreesToRadians(45.0f),
                 1.5f,
@@ -22,15 +26,15 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering.Scripts
 
         public bool Active { get; set; } = true;
 
-        private float yaw = -90f; // Угол поворота по горизонтали
-        private float pitch = 0f; // Угол поворота по вертикали
-        private float distance = 5f; // Расстояние от объекта (отдаление/приближение)
+        private float yaw = -90f; 
+        private float pitch = 0f; 
+        private float distance = 5f; 
 
         private Vector2 lastMousePos;
         private bool firstMouse = true;
 
-        private float sensitivity = 0.1f; // Чувствительность мыши
-        private float speed = 0.1f; // Скорость перемещения
+        private float sensitivity = 0.1f; 
+        private float speed = 0.4f; 
 
         public CameraScript(Vector3 target, float startDistance)
         {
@@ -73,39 +77,84 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering.Scripts
             }
 
             float offsetX = (mousePos.X - lastMousePos.X) * sensitivity;
-            float offsetY = (lastMousePos.Y - mousePos.Y) * sensitivity; // Инвертируем ось Y
+            float offsetY = (lastMousePos.Y - mousePos.Y) * sensitivity; 
 
             lastMousePos = mousePos;
 
             yaw += offsetX;
-            pitch = MathHelper.Clamp(pitch + offsetY, -89f, 89f); // Ограничиваем наклон
+            pitch = MathHelper.Clamp(pitch + offsetY, -89f, 89f); 
+
+            UpdatePosition();
+        }
+
+        public void ProcessTarget(Vector2 mousePos)
+        {
+            if (firstMouse)
+            {
+                lastMousePos = mousePos;
+                firstMouse = false;
+            }
+
+            float offsetX = (mousePos.X - lastMousePos.X) * sensitivity;
+            float offsetY = (lastMousePos.Y - mousePos.Y) * sensitivity; 
+
+            lastMousePos = mousePos;
+            
+            
+            Vector3 forward = (Target - Position).Normalized();
+            Vector3 right = Vector3.Cross(forward, Up).Normalized();
+            Vector3 localUp = Vector3.Cross(right, forward).Normalized();
+
+            
+            
+            Target -= right * offsetX;
+            Target -= localUp * offsetY;
 
             UpdatePosition();
         }
 
         public void ProcessScroll(float offset)
         {
-            distance = MathHelper.Clamp(distance - offset * 0.5f, 2f, 20f);
+            distance = MathHelper.Clamp(distance - offset * 0.5f, MinDistance, MaxDistance);
             UpdatePosition();
+        }
+
+        private void moveUp(Vector3 pos)
+        {
+            Target += pos;
+
+            Position += pos;
+        }
+
+        private void moveDown(Vector3 pos)
+        {
+            Target -= pos;
+
+            Position -= pos;
         }
 
         public void ProcessKeyboard(PhysicalKey key)
         {
             Vector3 forward = (Target - Position).Normalized();
+            
             Vector3 right = Vector3.Cross(forward, Up).Normalized();
+            
+            Vector3 actualUp = Vector3.Cross(right, forward).Normalized();
 
-            if (key == PhysicalKey.W) Target += forward * speed;
-            if (key == PhysicalKey.S) Target -= forward * speed;
-            if (key == PhysicalKey.A) Target -= right * speed;
-            if (key == PhysicalKey.D) Target += right * speed;
-            if (key == PhysicalKey.Q) Target += Up * speed; // Вверх
-            if (key == PhysicalKey.E) Target -= Up * speed; // Вниз
+            if (key == PhysicalKey.W) moveUp( forward * speed);
+            if (key == PhysicalKey.S) moveDown( forward * speed);
+            if (key == PhysicalKey.A) moveDown( right * speed);
+            if (key == PhysicalKey.D) moveUp( right * speed);
+
+            
+            if (key == PhysicalKey.Q) moveUp( actualUp * speed);
+            if (key == PhysicalKey.E) moveDown( actualUp * speed);
 
             UpdatePosition();
         }
 
         OpenGL3DFrame? _frame;
-        
+
         public void SetFrame(OpenGL3DFrame? frame)
         {
             _frame = frame;
