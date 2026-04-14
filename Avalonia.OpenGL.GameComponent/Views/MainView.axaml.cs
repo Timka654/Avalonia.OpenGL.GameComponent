@@ -21,8 +21,6 @@ public partial class MainView : UserControl
     {
         var scene = new Scene();
 
-        obj.AddScene(scene);
-
         var sun = new DirectionalLight()
         {
             Direction = new Vector3(-1f, -1f, 0f), 
@@ -45,6 +43,8 @@ public partial class MainView : UserControl
 
         scene.AddChild(cam);
 
+
+        obj.AddScene(scene);
 
         var cube = new Cube3DWithNormals();
         cube.Position = new Vector3(0, 0, -5);

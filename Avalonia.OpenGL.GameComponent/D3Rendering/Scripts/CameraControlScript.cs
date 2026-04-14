@@ -96,6 +96,8 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering.Scripts
             }
         }
 
+
+
         private void CurrentScene_OnUpdateFrame(OpenGL3DFrame? frame)
         {
             if (frame == null && _frame != null)
