@@ -68,6 +68,8 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering
 
         public OpenGL3DFrameTime Time { get; } = new OpenGL3DFrameTime();
 
+        private static int initCount = 0;
+
         protected override void OpenTkInit()
         {
             BasicRenderShared ??= Shader.Default;
@@ -79,6 +81,8 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering
             buildViewMatrix();
             
             inited = true;
+
+            Console.Error.WriteLine($"[PCB] GL context init #{++initCount}: {GL.GetString(StringName.Version)}");
 
             OnInitializedFrame(this);
         }

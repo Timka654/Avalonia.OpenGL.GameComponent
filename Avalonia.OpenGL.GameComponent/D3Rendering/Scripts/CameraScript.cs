@@ -29,6 +29,15 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering.Scripts
             => Projection = Matrix4.CreatePerspectiveFieldOfView(
                 MathHelper.DegreesToRadians(fieldOfViewDegrees), aspectRatio, nearPlane, farPlane);
 
+        /// <summary>Установить орбиту камеры (yaw/pitch в градусах, дистанция до цели).</summary>
+        public void SetOrbit(float yawDegrees, float pitchDegrees, float orbitDistance)
+        {
+            yaw = yawDegrees;
+            pitch = MathHelper.Clamp(pitchDegrees, -89f, 89f);
+            distance = MathHelper.Clamp(orbitDistance, MinDistance, MaxDistance);
+            UpdatePosition();
+        }
+
         public bool Active { get; set; } = true;
 
         private float yaw = -90f; 
