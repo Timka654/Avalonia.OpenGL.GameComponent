@@ -24,6 +24,11 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering.Scripts
                 100.0f
             );
 
+        /// <summary>Пересчитать проекцию (fov/aspect/near/far) — например, под размер окна и большую дальность.</summary>
+        public void SetProjection(float fieldOfViewDegrees, float aspectRatio, float nearPlane, float farPlane)
+            => Projection = Matrix4.CreatePerspectiveFieldOfView(
+                MathHelper.DegreesToRadians(fieldOfViewDegrees), aspectRatio, nearPlane, farPlane);
+
         public bool Active { get; set; } = true;
 
         private float yaw = -90f; 

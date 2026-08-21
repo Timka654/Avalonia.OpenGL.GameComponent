@@ -21,7 +21,14 @@ namespace Avalonia.OpenGL.GameComponent.Utils
 
         private void RecalculateBounds()
         {
+            // Полная мировая матрица: локальная * родитель * деда... (как в Object3D.Draw)
             Matrix4 modelMatrix = this.parent!.GetModelMatrix();
+            IRenderedObject? ancestor = this.parent.Parent;
+            while (ancestor != null)
+            {
+                modelMatrix = modelMatrix * ancestor.GetModelMatrix();
+                ancestor = ancestor.Parent;
+            }
 
             var bounds = this.parent!.GetBounds();
             Vector3 LocalMin = bounds.min;

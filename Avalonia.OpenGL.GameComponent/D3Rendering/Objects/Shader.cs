@@ -13,11 +13,19 @@
 
         public static Shader FromFile(string vertexPath, string fragmentPath)
         {
-
-            string vertexShaderSource = File.ReadAllText(vertexPath);
-            string fragmentShaderSource = File.ReadAllText(fragmentPath);
+            string vertexShaderSource = ReadShader(vertexPath);
+            string fragmentShaderSource = ReadShader(fragmentPath);
 
             return new Shader(vertexShaderSource, fragmentShaderSource);
+        }
+
+        private static string ReadShader(string path)
+        {
+            if (!Path.IsPathRooted(path))
+                path = Path.Combine(AppContext.BaseDirectory, path);
+            if (!File.Exists(path))
+                throw new FileNotFoundException($"Shader file not found: {path}");
+            return File.ReadAllText(path);
         }
 
         public Shader(string vertexShaderSource, string fragmentShaderSource)
@@ -109,20 +117,20 @@
 
         #region Data
 
-        public static string VertexShaderSource => _vertexShaderSource ??= File.ReadAllText("D3Rendering/Data/Shaders/VertexShader.glsl");
+        public static string VertexShaderSource => _vertexShaderSource ??= ReadShader("D3Rendering/Data/Shaders/VertexShader.glsl");
         static string? _vertexShaderSource;
 
-        public static string FragmentShaderSource => _fragmentShaderSource ??= File.ReadAllText("D3Rendering/Data/Shaders/FragmentShader.glsl");
+        public static string FragmentShaderSource => _fragmentShaderSource ??= ReadShader("D3Rendering/Data/Shaders/FragmentShader.glsl");
         static string? _fragmentShaderSource;
 
         public static Shader Default => _default ??= new Shader(VertexShaderSource, FragmentShaderSource);
         static Shader _default;
 
 
-        public static string LitVertexShaderSource => _litVertexShaderSource ??= File.ReadAllText("D3Rendering/Data/Shaders/LitVertexShader.glsl");
+        public static string LitVertexShaderSource => _litVertexShaderSource ??= ReadShader("D3Rendering/Data/Shaders/LitVertexShader.glsl");
         static string? _litVertexShaderSource;
 
-        public static string LitFragmentShaderSource => _litFragmentShaderSource ??= File.ReadAllText("D3Rendering/Data/Shaders/LitFragmentShader.glsl");
+        public static string LitFragmentShaderSource => _litFragmentShaderSource ??= ReadShader("D3Rendering/Data/Shaders/LitFragmentShader.glsl");
         static string? _litFragmentShaderSource;
 
         public static Shader Lit => _lit ??= new Shader(LitVertexShaderSource, LitFragmentShaderSource);

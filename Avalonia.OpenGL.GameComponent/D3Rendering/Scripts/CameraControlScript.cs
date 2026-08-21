@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Avalonia.OpenGL.GameComponent.D3Rendering.Scripts
 {
-    class CameraControlScript : IScriptObject
+    public class CameraControlScript : IScriptObject
     {
         MouseCameraControlEnum mode = MouseCameraControlEnum.None;
 
