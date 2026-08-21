@@ -68,6 +68,9 @@
         {
             foreach (var item in Scripts)
             {
+                if (!item.Active)
+                    continue;
+
                 item.Update();
             }
         }

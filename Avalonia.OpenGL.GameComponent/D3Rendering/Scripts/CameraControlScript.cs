@@ -22,6 +22,9 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering.Scripts
 
         protected void OnPointerPressed(object? sender, PointerPressedEventArgs e)
         {
+            if (!Active)
+                return;
+
             var point = e.GetCurrentPoint(_frame);
 
             if (!movementPress && !positionPress)
@@ -37,6 +40,9 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering.Scripts
 
         protected void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
         {
+            if (!Active)
+                return;
+
             var point = e.GetCurrentPoint(_frame);
 
             if (movementPress)
@@ -52,6 +58,9 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering.Scripts
 
         protected void OnPointerMoved(object? sender, PointerEventArgs e)
         {
+            if (!Active)
+                return;
+
             if (movementPress)
             {
                 var mousePos = e.GetPosition(_frame);
@@ -68,6 +77,9 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering.Scripts
 
         protected void OnPointerWheelChanged(object? sender, PointerWheelEventArgs e)
         {
+            if (!Active)
+                return;
+
             _camera.ProcessScroll((float)e.Delta.Y);
         }
 
@@ -129,6 +141,9 @@ namespace Avalonia.OpenGL.GameComponent.D3Rendering.Scripts
 
         private void OnKeyDown(object? sender, KeyEventArgs e)
         {
+            if (!Active)
+                return;
+
             _camera.ProcessKeyboard(e.PhysicalKey);
         }
 
